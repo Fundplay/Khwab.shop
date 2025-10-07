@@ -374,7 +374,7 @@
                         db.collection('users').doc(user.uid).set({
                             username: username,
                             email: email,
-                            balance: 100.00, // Welcome bonus
+                            balance: 0.5., // Welcome bonus
                             investments: [],
                             myReferralCode: `NEXA${Math.floor(1000 + Math.random() * 9000)}`,
                             referredBy: referralCode.toUpperCase() || null
