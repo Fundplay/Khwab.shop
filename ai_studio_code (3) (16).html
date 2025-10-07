@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa - Modern Trading</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* --- 🎨 Global Design & Theme --- */
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #f0f0f0;
+            --accent-color: #00bfff; /* Neon Blue */
+            --green-glow: #00ff7f; /* Spring Green */
+            --red-glow: #ff4500;   /* Orange Red */
+            --card-bg: rgba(22, 22, 22, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --font-family: 'Poppins', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        /* --- 🔥 Authentication Screen --- */
+        #auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .auth-box h2 { text-align: center; margin-bottom: 25px; font-size: 28px; }
+        .auth-form .form-group { margin-bottom: 20px; }
+        .auth-form label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+        .auth-form input { width: 100%; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-family); font-size: 16px; }
+        .auth-toggle-link { text-align: center; margin-top: 20px; font-size: 14px; }
+        .auth-toggle-link a { color: var(--accent-color); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .error-message { color: var(--red-glow); font-size: 14px; text-align: center; margin-top: 15px; min-height: 20px; }
+
+        /* --- 📱 Main App Container --- */
+        #app-container { padding-bottom: 100px; /* Space for bottom nav */ }
+        
+        /* --- 🌐 Shared Header --- */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .logo { font-size: 28px; font-weight: 700; color: var(--text-color); text-shadow: 0 0 5px var(--accent-color); }
+        .notification-bell { position: relative; cursor: pointer; }
+        .notification-icon { font-size: 24px; color: var(--text-color); }
+        .notification-dot { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background-color: var(--red-glow); border-radius: 50%; border: 1px solid var(--bg-color); display: block; }
+
+        /* --- 🧭 Page & Transition System --- */
+        .page { display: none; opacity: 0; transition: opacity 0.4s ease-in-out; animation: fadeIn 0.5s forwards; }
+        .page.active { display: block; opacity: 1; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 🧭 Bottom Navigation Bar --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 10, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #888; text-decoration: none; font-size: 12px; transition: color 0.3s, text-shadow 0.3s; cursor: pointer; background: none; border: none; }
+        .nav-item i { font-size: 22px; margin-bottom: 5px; }
+        .nav-item.active { color: var(--accent-color); text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color); }
+
+        /* --- Generic Card & Section Title --- */
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .section-title { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+        
+        /* --- 🏠 Home Page --- */
+        .wallet-card h3 { font-size: 16px; font-weight: 400; color: #aaa; margin-bottom: 10px; }
+        .wallet-card .balance { font-size: 36px; font-weight: 600; color: var(--text-color); }
+        .investment-card { display: flex; flex-direction: column; gap: 15px; }
+        .investment-card .row { display: flex; justify-content: space-between; align-items: center; }
+        .investment-card .plan-name { font-size: 18px; font-weight: 600; }
+        .investment-card .amount { font-size: 18px; font-weight: 500; }
+        .investment-card .details { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #ccc; }
+        .risk-level { padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+        .risk-low { background-color: rgba(0, 255, 127, 0.2); color: #00ff7f; }
+        .risk-medium { background-color: rgba(255, 165, 0, 0.2); color: #ffa500; }
+        .risk-high { background-color: rgba(255, 69, 0, 0.2); color: #ff4500; }
+        .status { padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+        .status.active { background-color: rgba(0, 191, 255, 0.2); color: var(--accent-color); }
+
+        /* --- 💸 Invest Plan Page --- */
+        .invest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .invest-card { display: flex; flex-direction: column; gap: 15px; }
+        .invest-card .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .invest-card .plan-name { font-size: 20px; font-weight: 600; }
+        .invest-card .price { font-size: 20px; font-weight: 600; color: var(--accent-color); }
+        .invest-card .stats { display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 15px; font-size: 14px; }
+        .stat { text-align: center; }
+        .stat span { display: block; color: #aaa; font-size: 12px; margin-bottom: 4px; }
+        .profit { color: var(--green-glow); }
+        .loss { color: var(--red-glow); }
+        
+        /* --- 🔁 P2P Page --- */
+        .p2p-tabs { display: flex; gap: 10px; margin-bottom: 25px; background: var(--card-bg); padding: 5px; border-radius: 50px; }
+        .p2p-tab-btn { flex: 1; padding: 10px; background: transparent; border: none; color: #888; font-family: var(--font-family); font-weight: 600; font-size: 16px; border-radius: 50px; cursor: pointer; transition: all 0.3s; }
+        .p2p-tab-btn.active { color: var(--bg-color); background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+        .broker-list { display: flex; flex-direction: column; gap: 15px; }
+        .broker-card { display: flex; flex-direction: column; gap: 15px; padding: 15px; }
+        .broker-card .top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .broker-info h4 { font-size: 18px; margin-bottom: 4px; }
+        .broker-info .stats { font-size: 12px; color: #aaa; }
+        .broker-card .price { font-size: 18px; font-weight: 600; color: var(--text-color); }
+        .broker-card .middle { display: flex; justify-content: space-between; font-size: 14px; color: #ccc; border-top: 1px solid var(--border-color); padding-top: 15px; }
+        .broker-card .limit span, .broker-card .payment-methods span { display: block; font-size: 12px; color: #888; margin-bottom: 3px; }
+        .broker-card .payment-methods { text-align: right; }
+        .payment-method { display: inline-block; background: rgba(255, 255, 255, 0.1); padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
+        
+        /* --- 👤 Profile & Referral Page --- */
+        .page-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .back-btn { background: none; border: none; color: var(--text-color); font-size: 22px; cursor: pointer; margin-right: 15px; }
+        .profile-info { text-align: center; margin-bottom: 40px; }
+        .profile-info h2 { font-size: 24px; font-weight: 600; }
+        .profile-info p { font-size: 16px; color: #aaa; }
+        .profile-actions { display: flex; flex-direction: column; gap: 15px; }
+        .profile-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 15px 20px; border-radius: 12px; text-align: left; font-size: 16px; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+        .referral-content { text-align: center; }
+        .referral-content p { color: #aaa; margin-bottom: 30px; }
+        .referral-code-box { background: var(--bg-color); border: 2px dashed var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .referral-code { font-size: 20px; font-weight: 600; letter-spacing: 2px; }
+        .copy-icon { font-size: 20px; cursor: pointer; color: var(--accent-color); }
+        
+        /* --- General Buttons --- */
+        .btn { background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; font-family: var(--font-family); transition: all 0.3s; text-align: center; width: 100%; }
+        .btn.glow-blue:hover, .btn.glow-blue { background-color: var(--accent-color); color: var(--bg-color); box-shadow: 0 0 15px var(--accent-color), 0 0 25px var(--accent-color); }
+        .btn.glow-green { border-color: var(--green-glow); color: var(--green-glow); }
+        .btn.glow-green:hover { background-color: var(--green-glow); color: var(--bg-color); box-shadow: 0 0 15px var(--green-glow); }
+        .btn.glow-red { border-color: var(--red-glow); color: var(--red-glow); }
+        .btn.glow-red:hover { background-color: var(--red-glow); color: var(--bg-color); box-shadow: 0 0 15px var(--red-glow); }
+
+        /* --- 🎨 Popups --- */
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; place-items: center; z-index: 2000; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .popup-overlay.show { display: grid; opacity: 1; }
+        .popup-content { background: var(--bg-color); border: 1px solid var(--border-color); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; transform: scale(0.9); transition: transform 0.3s ease-in-out; }
+        .popup-overlay.show .popup-content { transform: scale(1); }
+        .popup-content h2 { margin-bottom: 15px; }
+        .popup-content p { color: #aaa; margin-bottom: 25px; }
+        .popup-content .icon { font-size: 48px; margin-bottom: 20px; }
+        .icon.success { color: var(--green-glow); } .icon.error { color: var(--red-glow); }
+        .notification-list { list-style: none; text-align: left; }
+        .notification-item { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item .icon { font-size: 20px; margin-right: 15px; color: var(--accent-color); }
+        .popup-form .form-group { margin-bottom: 15px; text-align: left; }
+        .popup-form label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
+        .popup-form input, .popup-form select { width: 100%; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-family); }
+    </style>
+</head>
+<body>
+
+    <!-- 🔥 Authentication Container -->
+    <div id="auth-container">
+        <div class="auth-box">
+            <!-- Loading State -->
+            <p id="loading-state" class="hidden" style="text-align: center;">Loading...</p>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form">
+                <h2>Sign In</h2>
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn glow-blue">Sign In</button>
+                <p class="error-message" id="login-error"></p>
+                <p class="auth-toggle-link">Don't have an account? <a id="show-signup">Sign Up</a></p>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form hidden">
+                <h2>Create Account</h2>
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email Address</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-referral">Referral Code (Optional)</label>
+                    <input type="text" id="signup-referral">
+                </div>
+                <button type="submit" class="btn glow-blue">Sign Up</button>
+                <p class="error-message" id="signup-error"></p>
+                <p class="auth-toggle-link">Already have an account? <a id="show-login">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📱 Main App Container -->
+    <div id="app-container" class="hidden">
+        <div class="container">
+            <!-- 🌐 Shared Header for All Pages -->
+            <header class="header">
+                <div class="logo">Nexa</div>
+                <div class="notification-bell" id="notification-bell"> <i class="fas fa-bell notification-icon"></i> <span class="notification-dot" id="notification-dot"></span> </div>
+            </header>
+
+            <!-- 🏠 1. Home Page -->
+            <div id="home-page" class="page active">
+                <div class="card wallet-card"> <h3>Your Wallet Balance</h3> <div class="balance" id="wallet-balance">$0.00</div> </div>
+                <h2 class="section-title">Your Investments</h2>
+                <div id="investments-list">
+                    <!-- User's investments will be rendered here by JS -->
+                </div>
+            </div>
+
+            <!-- 💸 2. Invest Plan Page -->
+            <div id="invest-page" class="page">
+                <h2 class="section-title">Investment Plans</h2>
+                <div class="invest-grid">
+                    <div class="card invest-card" data-plan-name="Stable Starter" data-invest-amount="200" data-profit="5" data-risk="Low" data-duration="15d"> <div class="top-row"> <span class="plan-name">Stable Starter</span> <span class="price">$200</span> </div> <div class="stats"> <div class="stat"><span class="profit">+5%</span>Profit</div> <div class="stat"><span class="loss">-1%</span>Loss</div> <div class="stat"><span>Risk</span><strong class="risk-level risk-low">Low</strong></div> <div class="stat"><span>Duration</span><strong>15d</strong></div> </div> <button class="btn glow-blue invest-now-btn">Invest Now</button> </div>
+                    <div class="card invest-card" data-plan-name="Quantum Growth" data-invest-amount="500" data-profit="15" data-risk="Medium" data-duration="30d"> <div class="top-row"> <span class="plan-name">Quantum Growth</span> <span class="price">$500</span> </div> <div class="stats"> <div class="stat"><span class="profit">+15%</span>Profit</div> <div class="stat"><span class="loss">-5%</span>Loss</div> <div class="stat"><span>Risk</span><strong class="risk-level risk-medium">Medium</strong></div> <div class="stat"><span>Duration</span><strong>30d</strong></div> </div> <button class="btn glow-blue invest-now-btn">Invest Now</button> </div>
+                    <div class="card invest-card" data-plan-name="Apex Predator" data-invest-amount="1500" data-profit="35" data-risk="High" data-duration="60d"> <div class="top-row"> <span class="plan-name">Apex Predator</span> <span class="price">$1500</span> </div> <div class="stats"> <div class="stat"><span class="profit">+35%</span>Profit</div> <div class="stat"><span class="loss">-15%</span>Loss</div> <div class="stat"><span>Risk</span><strong class="risk-level risk-high">High</strong></div> <div class="stat"><span>Duration</span><strong>60d</strong></div> </div> <button class="btn glow-blue invest-now-btn">Invest Now</button> </div>
+                </div>
+            </div>
+
+            <!-- 🔁 3. P2P Page -->
+            <div id="p2p-page" class="page">
+                <div class="p2p-tabs">
+                    <button class="p2p-tab-btn active" data-type="Buy">Buy</button>
+                    <button class="p2p-tab-btn" data-type="Sell">Sell</button>
+                </div>
+                <div class="broker-list">
+                    <div class="card broker-card"> <div class="top"> <div class="broker-info"> <h4>CryptoKing</h4> <div class="stats">98.5% Completion | 152 Trades</div> </div> <div class="price">283.50 PKR</div> </div> <div class="middle"> <div class="limit"> <span>Available</span> <strong>$100 - $5,000</strong> </div> <div class="payment-methods"> <span>Methods</span> <div> <span class="payment-method">Easypaisa</span> <span class="payment-method">JazzCash</span> </div> </div> </div> <button class="btn glow-green p2p-action-btn">Buy</button> </div>
+                    <div class="card broker-card"> <div class="top"> <div class="broker-info"> <h4>TradeMaster</h4> <div class="stats">99.2% Completion | 310 Trades</div> </div> <div class="price">283.75 PKR</div> </div> <div class="middle"> <div class="limit"> <span>Available</span> <strong>$50 - $1,000</strong> </div> <div class="payment-methods"> <span>Methods</span> <div><span class="payment-method">Easypaisa</span></div> </div> </div> <button class="btn glow-green p2p-action-btn">Buy</button> </div>
+                </div>
+            </div>
+
+            <!-- 👤 4. Profile Page -->
+            <div id="profile-page" class="page">
+                <div class="profile-info"> <h2 id="profile-name">User</h2> <p id="profile-email">user@example.com</p> </div>
+                <div class="profile-actions">
+                    <button class="profile-btn" id="referral-btn" data-page="referral-page">Referral</button>
+                    <button class="profile-btn" id="logout-btn" style="color: var(--red-glow);">Logout</button>
+                </div>
+            </div>
+
+            <!-- ✨ 5. Referral Page -->
+            <div id="referral-page" class="page">
+                <div class="page-header"> <button id="back-to-profile-btn" class="back-btn"><i class="fas fa-arrow-left"></i></button> <h2 class="section-title" style="margin-bottom: 0;">Refer & Earn</h2> </div>
+                <div class="referral-content"> <p>Share your code with friends and earn rewards.</p> <div class="referral-code-box"> <span class="referral-code" id="referral-code-text">NEXAXXXX</span> <i class="fas fa-copy copy-icon" id="copy-referral-code"></i> </div> <button class="btn glow-blue">Share Now</button> </div>
+            </div>
+        </div>
+
+        <!-- 🧭 Bottom Navigation Bar -->
+        <nav class="bottom-nav"> <button class="nav-item active" data-page="home-page"> <i class="fas fa-home"></i> <span>Home</span> </button> <button class="nav-item" data-page="invest-page"> <i class="fas fa-chart-line"></i> <span>Invest</span> </button> <button class="nav-item" data-page="p2p-page"> <i class="fas fa-exchange-alt"></i> <span>P2P</span> </button> <button class="nav-item" data-page="profile-page"> <i class="fas fa-user"></i> <span>Profile</span> </button> </nav>
+    </div>
+    
+    <!-- Popups -->
+    <div id="success-popup" class="popup-overlay"> <div class="popup-content"> <div class="icon success">🎉</div> <h2>Congratulations!</h2> <p>You have invested successfully.</p> <button class="btn glow-blue close-popup-btn">Done</button> </div> </div>
+    <div id="error-popup" class="popup-overlay"> <div class="popup-content"> <div class="icon error">⚠️</div> <h2>Insufficient Balance</h2> <p>You do not have enough funds.</p> <button class="btn glow-blue close-popup-btn">Okay</button> </div> </div>
+    <div id="p2p-popup" class="popup-overlay"> <div class="popup-content"> <h2 id="p2p-popup-title">Trade Form</h2> <form id="p2p-form" class="popup-form"> <div class="form-group"> <label for="username">Username</label> <input type="text" id="username" required> </div> <div class="form-group"> <label for="email">Email</label> <input type="email" id="email" required> </div> <div class="form-group"> <label for="payment-option">Payment Option</label> <select id="payment-option" required> <option value="Easypaisa">Easypaisa</option> <option value="JazzCash">JazzCash</option> </select> </div> <div class="form-group"> <label for="amount">Amount ($)</label> <input type="number" id="amount" placeholder="e.g., 100" required> </div> <button type="submit" class="btn glow-blue">Submit</button> <button type="button" class="btn close-popup-btn" style="margin-top: 10px; background: transparent; border-color: #555; color:#aaa;">Cancel</button> </form> </div> </div>
+    <div id="notification-popup" class="popup-overlay"> <div class="popup-content"> <h2>Notifications</h2> <ul class="notification-list"> <li class="notification-item"> <i class="fas fa-check-circle icon"></i> <div> <strong>Successful Deposit</strong> <span style="font-size: 12px; color: #888;">$250 added.</span> </div> </li> <li class="notification-item"> <i class="fas fa-rocket icon"></i> <div> <strong>New Plan Alert</strong> <span style="font-size: 12px; color: #888;">Check out 'Galaxy Voyager'.</span> </div> </li> </ul> <button class="btn glow-blue close-popup-btn">Close</button> </div> </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- 🔥 Firebase Configuration ---
+        // IMPORTANT: Replace this with your own Firebase project's configuration.
+        const firebaseConfig = {
+            // PASTE YOUR FIREBASE CONFIGURATION HERE
+           apiKey: "AIzaSyAj_tnCf9n7QYL0I1_p7v6YRh7A1eiN7fE",
+  authDomain: "test-66dca.firebaseapp.com",
+  projectId: "test-66dca",
+  storageBucket: "test-66dca.firebasestorage.app",
+  messagingSenderId: "650941300097",
+  appId: "1:650941300097:web:b4e9a63fd4fd64a7be3c80",
+  measurementId: "G-5SP77R0VXL"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 🗃️ Global State ---
+            let currentUserData = null;
+            let currentUserId = null;
+            let tradeType = 'Buy'; // Default P2P trade type
+
+            // --- DOM Elements ---
+            const authContainer = document.getElementById('auth-container');
+            const appContainer = document.getElementById('app-container');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const showSignupBtn = document.getElementById('show-signup');
+            const showLoginBtn = document.getElementById('show-login');
+            const logoutBtn = document.getElementById('logout-btn');
+            const pages = document.querySelectorAll('.page');
+            const navItems = document.querySelectorAll('.nav-item');
+            const loadingState = document.getElementById('loading-state');
+
+            // --- 🔥 Authentication Logic ---
+            auth.onAuthStateChanged(async (user) => {
+                loadingState.classList.add('hidden'); // Hide loading message
+                loginForm.classList.remove('hidden'); // Show login form by default
+                
+                if (user) {
+                    // User is signed in
+                    currentUserId = user.uid;
+                    await fetchAndRenderUserData();
+                    authContainer.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    showPage('home-page'); // Default to home page on login
+                } else {
+                    // User is signed out
+                    currentUserData = null;
+                    currentUserId = null;
+                    authContainer.classList.remove('hidden');
+                    appContainer.classList.add('hidden');
+                }
+            });
+
+            // Login form submission
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+                errorEl.textContent = ''; // Clear previous errors
+
+                auth.signInWithEmailAndPassword(email, password)
+                    .catch(error => {
+                        switch (error.code) {
+                            case 'auth/user-not-found':
+                                errorEl.textContent = 'No account found with this email.';
+                                break;
+                            case 'auth/wrong-password':
+                                errorEl.textContent = 'Incorrect password. Please try again.';
+                                break;
+                            default:
+                                errorEl.textContent = 'An error occurred. Please try again.';
+                        }
+                    });
+            });
+
+            // Signup form submission
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('signup-username').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm-password').value;
+                const referralCode = document.getElementById('signup-referral').value;
+                const errorEl = document.getElementById('signup-error');
+                errorEl.textContent = ''; // Clear previous errors
+
+                if (password !== confirmPassword) {
+                    errorEl.textContent = "Passwords do not match.";
+                    return;
+                }
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        const user = userCredential.user;
+                        // Create a user document in Firestore
+                        db.collection('users').doc(user.uid).set({
+                            username: username,
+                            email: email,
+                            balance: 100.00, // Welcome bonus
+                            investments: [],
+                            myReferralCode: `NEXA${Math.floor(1000 + Math.random() * 9000)}`,
+                            referredBy: referralCode || null
+                        });
+                    })
+                    .catch(error => {
+                        switch (error.code) {
+                            case 'auth/email-already-in-use':
+                                errorEl.textContent = 'This email is already registered.';
+                                break;
+                            case 'auth/weak-password':
+                                errorEl.textContent = 'Password should be at least 6 characters.';
+                                break;
+                            default:
+                                errorEl.textContent = 'Failed to create account. Please try again.';
+                        }
+                    });
+            });
+
+            // Logout button
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut();
+            });
+
+            // Toggle between login and signup forms
+            showSignupBtn.addEventListener('click', () => {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+            });
+            showLoginBtn.addEventListener('click', () => {
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            });
+
+            // --- 🗃️ Data Fetching & Rendering ---
+            async function fetchAndRenderUserData() {
+                if (!currentUserId) return;
+                const userDocRef = db.collection('users').doc(currentUserId);
+                
+                // Use onSnapshot for real-time updates
+                userDocRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        currentUserData = doc.data();
+                        renderUI();
+                    } else {
+                        console.error("No such user document!");
+                        auth.signOut(); // Log out if data is missing
+                    }
+                }, (error) => {
+                    console.error("Error fetching user data:", error);
+                });
+            }
+
+            function renderUI() {
+                if (!currentUserData) return;
+                // Wallet Balance
+                document.getElementById('wallet-balance').textContent = `$${currentUserData.balance.toFixed(2)}`;
+                // Profile Info
+                document.getElementById('profile-name').textContent = currentUserData.username;
+                document.getElementById('profile-email').textContent = currentUserData.email;
+                document.getElementById('username').value = currentUserData.username; // For P2P form
+                document.getElementById('email').value = currentUserData.email; // For P2P form
+                // Referral Code
+                document.getElementById('referral-code-text').textContent = currentUserData.myReferralCode;
+                // Investments List
+                const investmentsList = document.getElementById('investments-list');
+                investmentsList.innerHTML = ''; // Clear existing list
+                if (currentUserData.investments.length === 0) {
+                    investmentsList.innerHTML = '<p style="text-align:center; color:#888;">No active investments.</p>';
+                } else {
+                    currentUserData.investments.forEach(inv => {
+                        const investmentHTML = `<div class="card investment-card"><div class="row"><span class="plan-name">${inv.planName}</span><span class="amount">$${inv.amount.toFixed(2)}</span></div><div class="details"><span>Profit: <strong>+${inv.profit}%</strong></span><span class="risk-level risk-${inv.risk.toLowerCase()}">${inv.risk}</span><span>Duration: <strong>${inv.duration}</strong></span><span class="status active">Active</span></div></div>`;
+                        investmentsList.insertAdjacentHTML('beforeend', investmentHTML);
+                    });
+                }
+            }
+
+            // --- 🧭 General Page Navigation Function ---
+            function showPage(pageId) {
+                pages.forEach(page => page.classList.toggle('active', page.id === pageId));
+                const isMainPage = Array.from(navItems).some(item => item.dataset.page === pageId);
+                if (isMainPage) {
+                    navItems.forEach(nav => nav.classList.toggle('active', nav.dataset.page === pageId));
+                }
+            }
+            
+            navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
+
+            // --- 🔔 Notification Logic ---
+            document.getElementById('notification-bell').addEventListener('click', () => {
+                showPopup('notification-popup');
+                document.getElementById('notification-dot').style.display = 'none';
+            });
+
+            // --- 💸 Investment Logic ---
+            document.querySelectorAll('.invest-now-btn').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    if (!currentUserData) return;
+
+                    const card = e.target.closest('.invest-card');
+                    const investAmount = parseFloat(card.dataset.investAmount);
+
+                    if (currentUserData.balance >= investAmount) {
+                        const newBalance = currentUserData.balance - investAmount;
+                        const newInvestment = {
+                            planName: card.dataset.planName,
+                            amount: investAmount,
+                            profit: card.dataset.profit,
+                            risk: card.dataset.risk,
+                            duration: card.dataset.duration
+                        };
+                        
+                        const updatedInvestments = [...currentUserData.investments, newInvestment];
+
+                        // Update Firestore
+                        await db.collection('users').doc(currentUserId).update({
+                            balance: newBalance,
+                            investments: updatedInvestments
+                        });
+                        // UI will update automatically due to onSnapshot listener
+                        showPopup('success-popup');
+                    } else {
+                        showPopup('error-popup');
+                    }
+                });
+            });
+
+            // --- 🔁 P2P Logic ---
+            const p2pTabs = document.querySelectorAll('.p2p-tab-btn');
+            const p2pActionButtons = document.querySelectorAll('.p2p-action-btn');
+            const p2pPopupTitle = document.getElementById('p2p-popup-title');
+
+            p2pTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    p2pTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    tradeType = tab.dataset.type;
+                    p2pActionButtons.forEach(btn => {
+                        btn.textContent = tradeType;
+                        btn.classList.toggle('glow-green', tradeType === 'Buy');
+                        btn.classList.toggle('glow-red', tradeType === 'Sell');
+                    });
+                });
+            });
+            
+            p2pActionButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    p2pPopupTitle.textContent = `${tradeType} Request`;
+                    showPopup('p2p-popup');
+                });
+            });
+
+            document.getElementById('p2p-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const paymentOption = document.getElementById('payment-option').value;
+                const amount = document.getElementById('amount').value;
+                const message = `--- Nexa P2P Trade ---\nTrade Type: *${tradeType}*\nUsername: ${username}\nEmail: ${email}\nPayment Via: ${paymentOption}\nAmount: $${amount}\n--------------------`;
+                const whatsappNumber = "923161396518";
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+                hidePopup('p2p-popup');
+            });
+
+            // --- ✨ Referral Page Logic ---
+            document.getElementById('referral-btn').addEventListener('click', () => showPage('referral-page'));
+            document.getElementById('back-to-profile-btn').addEventListener('click', () => showPage('profile-page'));
+            
+            document.getElementById('copy-referral-code').addEventListener('click', (e) => {
+                const icon = e.target;
+                const code = document.getElementById('referral-code-text').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    icon.className = 'fas fa-check';
+                    icon.style.color = 'var(--green-glow)';
+                    setTimeout(() => {
+                        icon.className = 'fas fa-copy copy-icon';
+                        icon.style.color = 'var(--accent-color)';
+                    }, 2000);
+                });
+            });
+
+            // --- 🎨 Popup Handling ---
+            const popups = document.querySelectorAll('.popup-overlay');
+            const closeButtons = document.querySelectorAll('.close-popup-btn');
+            function showPopup(popupId) { document.getElementById(popupId).classList.add('show'); }
+            function hidePopup(popupId) { document.getElementById(popupId).classList.remove('show'); }
+            closeButtons.forEach(btn => btn.addEventListener('click', () => btn.closest('.popup-overlay').classList.remove('show')));
+            popups.forEach(popup => popup.addEventListener('click', (e) => { if (e.target === popup) popup.classList.remove('show'); }));
+        });
+    </script>
+</body>
+</html>
