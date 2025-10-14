@@ -1,0 +1,14 @@
+{
+  "name": "naxa",
+  "short_name": "naxa",
+  "start_url": "",
+  "display": "standalone",
+  "scope": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#0a84ff",
+  "description": "My website as an installable app",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
