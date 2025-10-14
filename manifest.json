@@ -1,7 +1,7 @@
 {
   "name": "naxa",
   "short_name": "naxa",
-  "start_url": "",
+  "start_url": "https://fundplay.github.io/Khwab.shop/",
   "display": "standalone",
   "scope": "/",
   "background_color": "#ffffff",
